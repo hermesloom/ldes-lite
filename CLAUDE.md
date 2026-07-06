@@ -48,7 +48,8 @@ Do not weaken any of the following without a very clear reason:
 
 ## Filesystem layout at runtime
 
-- `/opt/ldes-lite/` — code, owned `root:ldes`, group-readable
+- `/opt/ldes-lite/` — code, owned `deploy:ldes` (deploy user pulls from git,
+  ldes group has read access for the systemd service)
 - `/var/lib/ldes-lite/` — data, config, keys, owned `ldes:ldes`
 - systemd service runs as user `ldes`
 
@@ -64,7 +65,8 @@ Never commit any of these to git:
 ## Workflow when implementing an issue
 
 Follow this sequence precisely. **You have the tools to do all of it — use them,
-don't leave steps for the human.**
+don't leave steps for the human.** After merging, a separate workflow SSHes
+into the production server and restarts the service automatically.
 
 1. Read the issue carefully; ask for clarification via a comment if underspecified
 2. Make the smallest change that solves the issue
@@ -77,3 +79,7 @@ don't leave steps for the human.**
 9. **Open a pull request using `gh pr create`** — do NOT leave a "compare" link
    for the human to click. The PR title should describe the change; the body
    should say `Closes #N` referencing the originating issue.
+10. **Enable auto-merge on the PR:** run
+    `gh pr merge --auto --squash --delete-branch <PR_NUMBER>` immediately
+    after opening it. This queues the PR to merge automatically once CI passes,
+    without human intervention. Do NOT skip this step.

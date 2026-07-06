@@ -51,4 +51,4 @@ jobs:
           claude_args: |
             --max-turns 25
             --model claude-opus-4-7
-            --allowed-tools "Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(tsc:*),Bash(git status),Bash(git diff:*),Bash(git log:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh issue view:*)"
+            --allowed-tools "Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(tsc:*),Bash(git status),Bash(git diff:*),Bash(git log:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh pr merge:*),Bash(gh issue view:*)"
