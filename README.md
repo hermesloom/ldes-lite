@@ -56,7 +56,7 @@ domain, `systemctl start ldes-lite`, `systemctl reload caddy`.
 - `GET /nodes/NNNNNNNNNN.sig` — signature sidecar
 - `GET /pubkey` — public verification key (PEM)
 - `GET /health` — JSON health probe (no auth): `status`, `openNodeNumber`,
-  `openNodeSize`, `nodeCount`
+  `openNodeSize`, `nodeCount`, `uptimeSeconds`
 - `POST /ingest` — appends members (requires `Authorization: Bearer <token>`)
 
 ## License

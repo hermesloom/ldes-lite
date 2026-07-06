@@ -103,6 +103,7 @@ async function serveHealth(
     openNodeNumber: ctx.writer.openNodeNumber,
     openNodeSize: ctx.writer.openNodeSize,
     nodeCount: ctx.writer.nodeCount,
+    uptimeSeconds: Math.floor(process.uptime()),
   }) + "\n");
   res.writeHead(200, {
     "Content-Type": "application/json",
