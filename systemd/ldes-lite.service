@@ -1,0 +1,69 @@
+[Unit]
+Description=ldes-lite — minimal Linked Data Event Stream server
+Documentation=https://w3id.org/ldes/specification
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ldes
+Group=ldes
+WorkingDirectory=/opt/ldes-lite
+ExecStart=/usr/bin/node /opt/ldes-lite/src/server.ts
+
+Restart=on-failure
+RestartSec=5s
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+KillSignal=SIGTERM
+TimeoutStopSec=15s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ldes-lite
+
+Environment=NODE_ENV=production
+Environment=LDES_CONFIG=/var/lib/ldes-lite/config.json
+Environment=LDES_DATA_DIR=/var/lib/ldes-lite/data
+
+# ── Sandboxing ──────────────────────────────────────────────────────
+# Filesystem isolation
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/ldes-lite
+PrivateTmp=true
+PrivateDevices=true
+
+# Kernel & process isolation
+NoNewPrivileges=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectClock=true
+LockPersonality=true
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+# NOTE: MemoryDenyWriteExecute removed — V8 JIT needs W^X pages.
+
+# Network
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# Syscall filter — @system-service is a broad allowlist; only strip
+# privileged calls. Don't strip @resources (Node/V8 uses setrlimit etc).
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged
+SystemCallErrorNumber=EPERM
+
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+LimitNOFILE=4096
+MemoryHigh=256M
+MemoryMax=384M
+
+[Install]
+WantedBy=multi-user.target

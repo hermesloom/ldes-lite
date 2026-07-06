@@ -1,0 +1,21 @@
+{
+  "name": "ldes-lite",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check": "tsc --noEmit",
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts"
+  },
+  "devDependencies": {
+    "@types/n3": "^1.26.1",
+    "@types/node": "^26.1.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "@zazuko/env-node": "^3.1.0",
+    "n3": "^2.1.1",
+    "rdf-validate-shacl": "^0.6.5"
+  }
+}

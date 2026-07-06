@@ -1,0 +1,20 @@
+node_modules/
+*.log
+.env
+.env.*
+
+# Never commit any actual runtime state
+config.json
+!config.example.json
+ingest.token
+*.key
+*.pem
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

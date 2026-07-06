@@ -1,0 +1,18 @@
+{
+    email you@example.org
+}
+
+your-ldes-domain.example.org {
+    encode zstd gzip
+
+    reverse_proxy 127.0.0.1:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
+    }
+
+    log {
+        output stdout
+        format json
+        level INFO
+    }
+}

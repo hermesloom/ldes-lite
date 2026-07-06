@@ -1,0 +1,11 @@
+{
+  "baseIri": "https://your-ldes-domain.example.org/",
+  "listenHost": "127.0.0.1",
+  "listenPort": 3000,
+  "nodeSizeBytes": 1048576,
+  "timestampPath": "http://www.w3.org/ns/prov#generatedAtTime",
+  "shapeFile": "/var/lib/ldes-lite/shape.ttl",
+  "privateKeyFile": "/var/lib/ldes-lite/keys/ed25519.key",
+  "publicKeyFile": "/var/lib/ldes-lite/keys/ed25519.pub",
+  "ingestTokenFile": "/var/lib/ldes-lite/ingest.token"
+}
