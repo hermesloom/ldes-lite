@@ -1,0 +1,56 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+# If a newer commit lands mid-deploy, cancel this run — only the latest matters.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Pull and restart
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          ssh -i ~/.ssh/deploy_key deploy@$DEPLOY_HOST bash <<'REMOTE'
+          set -euo pipefail
+          cd /opt/ldes-lite
+          echo "==> current commit: $(git rev-parse --short HEAD)"
+          git fetch origin master
+          git reset --hard origin/master
+          echo "==> now at: $(git rev-parse --short HEAD)"
+          # Only reinstall deps if package-lock.json changed since last deploy
+          if ! diff -q .package-lock.json.deployed package-lock.json 2>/dev/null; then
+            echo "==> package-lock.json changed, running npm ci"
+            npm ci --omit=dev
+            cp package-lock.json .package-lock.json.deployed
+          else
+            echo "==> deps unchanged, skipping npm ci"
+          fi
+          echo "==> restarting service"
+          sudo /usr/bin/systemctl restart ldes-lite
+          echo "==> deployed"
+          REMOTE
+
+      - name: Verify service is up
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        run: |
+          sleep 3
+          curl -sf https://$DEPLOY_HOST/health | tee /dev/stderr | grep -q '"status":"ok"'
