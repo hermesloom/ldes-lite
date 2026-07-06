@@ -18,6 +18,9 @@ const PACKAGE_JSON_PATH = fileURLToPath(new URL("../package.json", import.meta.u
 const VERSION = (JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8")) as { version: string }).version;
 const SERVER_HEADER = `ldes-lite/${VERSION}`;
 
+const KITTEN_PATH = fileURLToPath(new URL("./kitten.jpg", import.meta.url));
+const KITTEN_JPEG = readFileSync(KITTEN_PATH);
+
 const HELLO_HTML = Buffer.from(
   `<!DOCTYPE html>
 <html lang="en">
@@ -28,6 +31,7 @@ const HELLO_HTML = Buffer.from(
 <body>
 <h1>Hello, world!</h1>
 <p>This is an <a href="https://w3id.org/ldes/specification">ldes-lite</a> server.</p>
+<p><img src="/kitten.jpg" width="365" height="547" alt="Kitten"></p>
 <ul>
 <li><a href="/root">/root</a> — LDES root node</li>
 <li><a href="/health">/health</a> — health probe</li>
@@ -51,6 +55,15 @@ function serveHello(req: IncomingMessage, res: ServerResponse): void {
     "Cache-Control": "no-cache",
   });
   res.end(req.method === "HEAD" ? undefined : HELLO_HTML);
+}
+
+function serveKitten(req: IncomingMessage, res: ServerResponse): void {
+  res.writeHead(200, {
+    "Content-Type": "image/jpeg",
+    "Content-Length": KITTEN_JPEG.length,
+    "Cache-Control": "public, max-age=3600",
+  });
+  res.end(req.method === "HEAD" ? undefined : KITTEN_JPEG);
 }
 
 async function serveRoot(
@@ -255,6 +268,7 @@ async function handle(
 
   if (req.method === "GET" || req.method === "HEAD") {
     if (url.pathname === "/") return serveHello(req, res);
+    if (url.pathname === "/kitten.jpg") return serveKitten(req, res);
     if (url.pathname === "/root") return serveRoot(req, res, ctx);
     if (url.pathname === "/pubkey") return servePubkey(req, res, ctx);
     if (url.pathname === "/health") return serveHealth(req, res, ctx);
