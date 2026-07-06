@@ -51,6 +51,7 @@ domain, `systemctl start ldes-lite`, `systemctl reload caddy`.
 
 ## HTTP surface
 
+- `GET /` — hello world HTML landing page with links to the endpoints below
 - `GET /root` — LDES root node with `tree:relation` links to all immutable nodes
 - `GET /nodes/NNNNNNNNNN` — a specific node (`Cache-Control: immutable` if frozen)
 - `GET /nodes/NNNNNNNNNN.sig` — signature sidecar
