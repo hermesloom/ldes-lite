@@ -18,10 +18,39 @@ const PACKAGE_JSON_PATH = fileURLToPath(new URL("../package.json", import.meta.u
 const VERSION = (JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8")) as { version: string }).version;
 const SERVER_HEADER = `ldes-lite/${VERSION}`;
 
+const HELLO_HTML = Buffer.from(
+  `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ldes-lite</title>
+</head>
+<body>
+<h1>Hello, world!</h1>
+<p>This is an <a href="https://w3id.org/ldes/specification">ldes-lite</a> server.</p>
+<ul>
+<li><a href="/root">/root</a> — LDES root node</li>
+<li><a href="/health">/health</a> — health probe</li>
+<li><a href="/pubkey">/pubkey</a> — public signing key</li>
+</ul>
+</body>
+</html>
+`,
+);
+
 interface Context {
   config: Config;
   writer: NodeWriter;
   validator: ShapeValidator;
+}
+
+function serveHello(req: IncomingMessage, res: ServerResponse): void {
+  res.writeHead(200, {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": HELLO_HTML.length,
+    "Cache-Control": "no-cache",
+  });
+  res.end(req.method === "HEAD" ? undefined : HELLO_HTML);
 }
 
 async function serveRoot(
@@ -225,6 +254,7 @@ async function handle(
   const url = new URL(req.url ?? "/", `http://${req.headers.host}`);
 
   if (req.method === "GET" || req.method === "HEAD") {
+    if (url.pathname === "/") return serveHello(req, res);
     if (url.pathname === "/root") return serveRoot(req, res, ctx);
     if (url.pathname === "/pubkey") return servePubkey(req, res, ctx);
     if (url.pathname === "/health") return serveHealth(req, res, ctx);
