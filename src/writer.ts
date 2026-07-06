@@ -238,4 +238,5 @@ export class NodeWriter {
   }
   get openNodeNumber(): number { return this.currentNumber; }
   get openNodeSize(): number { return this.currentSize; }
+  get nodeCount(): number { return this.allNodes.length; }
 }

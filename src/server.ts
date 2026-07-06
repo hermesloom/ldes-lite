@@ -87,6 +87,25 @@ async function serveSig(
   res.end(req.method === "HEAD" ? undefined : body);
 }
 
+async function serveHealth(
+  req: IncomingMessage,
+  res: ServerResponse,
+  ctx: Context,
+): Promise<void> {
+  const body = Buffer.from(JSON.stringify({
+    status: "ok",
+    openNodeNumber: ctx.writer.openNodeNumber,
+    openNodeSize: ctx.writer.openNodeSize,
+    nodeCount: ctx.writer.nodeCount,
+  }) + "\n");
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+    "Content-Length": body.length,
+    "Cache-Control": "no-cache",
+  });
+  res.end(req.method === "HEAD" ? undefined : body);
+}
+
 async function servePubkey(
   req: IncomingMessage,
   res: ServerResponse,
@@ -201,6 +220,7 @@ async function handle(
   if (req.method === "GET" || req.method === "HEAD") {
     if (url.pathname === "/root") return serveRoot(req, res, ctx);
     if (url.pathname === "/pubkey") return servePubkey(req, res, ctx);
+    if (url.pathname === "/health") return serveHealth(req, res, ctx);
 
     const sigMatch = SIG_PATH_PATTERN.exec(url.pathname);
     if (sigMatch) {
