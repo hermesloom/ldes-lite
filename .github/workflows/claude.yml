@@ -10,10 +10,8 @@ on:
   pull_request_review:
     types: [submitted]
 
-# Loop-safety: don't trigger on the bot's own actions.
 jobs:
   claude:
-    # Only run if a human mentioned @claude (or opened/assigned an issue with @claude in body)
     if: |
       github.actor != 'claude[bot]' &&
       github.actor != 'github-actions[bot]' &&
@@ -35,19 +33,16 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Run Claude
         uses: anthropics/claude-code-action@v1
@@ -56,3 +51,4 @@ jobs:
           claude_args: |
             --max-turns 25
             --model claude-opus-4-7
+            --allowed-tools "Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(tsc:*),Bash(git status),Bash(git diff:*),Bash(git log:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(gh issue view:*)"

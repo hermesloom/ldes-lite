@@ -55,17 +55,25 @@ Do not weaken any of the following without a very clear reason:
 ## What NOT to commit
 
 Never commit any of these to git:
-- `/var/lib/ldes-lite/config.json` (the real one — use `config.example.json`)
+- The real `/var/lib/ldes-lite/config.json` (use `config.example.json` instead)
 - `/var/lib/ldes-lite/keys/ed25519.key` (private key)
 - `/var/lib/ldes-lite/ingest.token`
 - `/var/lib/ldes-lite/data/`
 - Any real domain names or IP addresses
 
-## When implementing an issue
+## Workflow when implementing an issue
 
-1. Read the issue carefully; ask for clarification via comment if underspecified
+Follow this sequence precisely. **You have the tools to do all of it — use them,
+don't leave steps for the human.**
+
+1. Read the issue carefully; ask for clarification via a comment if underspecified
 2. Make the smallest change that solves the issue
-3. Run `npm run check` and fix any type errors
-4. Preserve the architecture invariants above
-5. Update README.md if you change the HTTP surface or on-disk layout
-6. If touching `writer.ts`, be very careful about the fsync sequence
+3. **Run `npm run check`** to type-check. Fix any errors and re-run until it passes.
+4. **Run `node --check src/server.ts`** as a final syntax sanity check.
+5. Preserve the architecture invariants above.
+6. Update `README.md` if you change the HTTP surface or on-disk layout.
+7. If touching `writer.ts`, be very careful about the fsync sequence.
+8. Commit your changes on the branch created for you.
+9. **Open a pull request using `gh pr create`** — do NOT leave a "compare" link
+   for the human to click. The PR title should describe the change; the body
+   should say `Closes #N` referencing the originating issue.
