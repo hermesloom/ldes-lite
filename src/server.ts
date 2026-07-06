@@ -1,7 +1,9 @@
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { readFile, stat } from "node:fs/promises";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { timingSafeEqual } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import { Parser as N3Parser, type Quad } from "n3";
 import { loadConfig, type Config } from "./config.ts";
 import { NodeWriter } from "./writer.ts";
@@ -11,6 +13,10 @@ import { loadSigner } from "./signer.ts";
 const NQUADS = "application/n-quads";
 const NODE_PATH_PATTERN = /^\/nodes\/(\d{10})$/;
 const SIG_PATH_PATTERN = /^\/nodes\/(\d{10})\.sig$/;
+
+const PACKAGE_JSON_PATH = fileURLToPath(new URL("../package.json", import.meta.url));
+const VERSION = (JSON.parse(readFileSync(PACKAGE_JSON_PATH, "utf8")) as { version: string }).version;
+const SERVER_HEADER = `ldes-lite/${VERSION}`;
 
 interface Context {
   config: Config;
@@ -266,6 +272,7 @@ async function main(): Promise<void> {
   const ctx: Context = { config, writer, validator };
 
   const server = createServer((req, res) => {
+    res.setHeader("Server", SERVER_HEADER);
     handle(req, res, ctx).catch((err) => {
       console.error("unhandled error:", err);
       if (!res.headersSent) {
